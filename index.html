@@ -141,6 +141,14 @@ body {
   font-weight: 700;
   color: var(--ink);
   user-select: none;
+  gap: 8px;
+}
+
+.win-bar span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .win-dots { display: flex; gap: 4px; }
@@ -570,7 +578,7 @@ body {
   border: 2px solid var(--border);
   border-radius: 4px;
   padding: 20px 22px;
-  width: 300px;
+  width: min(300px, calc(100vw - 32px));
   box-shadow: 4px 4px 0 var(--shadow);
 }
 
@@ -603,6 +611,114 @@ body {
   .exp-row { grid-template-columns: 80px 1fr; }
   .exp-badge { display: none; }
 }
+
+/* ---- MOBILE CONTACT FAB ---- */
+.mobile-contact-fab {
+  display: none;
+}
+
+/* ---- MOBILE BOTTOM NAV ---- */
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  /* Hide top taskbar — bottom nav takes over */
+  .taskbar { display: none; }
+  .panel { min-height: 100vh; padding-bottom: 72px; }
+
+  /* Gain content width on narrow phones */
+  .window { margin: 8px; }
+  .win-body { padding: 14px 12px; }
+
+  /* Hero text — prevent overflow at 320px */
+  .hero { font-size: clamp(20px, 6vw, 32px); }
+
+  /* About body — same fix */
+  .about-body { font-size: clamp(20px, 6vw, 28px); }
+
+  /* Section labels and card grid */
+  .sec-label { padding: 8px 10px 4px; }
+  .card-grid { padding: 6px 8px 10px; gap: 8px; }
+
+  /* Framework cards */
+  .framework { padding: 10px 12px; }
+
+  /* Experience list */
+  .exp-row { gap: 8px; grid-template-columns: 72px 1fr; }
+
+  /* Drawer */
+  .drawer { padding: 16px; }
+
+  /* Contact FAB — floats above bottom nav */
+  .mobile-contact-fab {
+    display: flex;
+    position: fixed;
+    bottom: 66px;
+    right: 16px;
+    align-items: center;
+    gap: 8px;
+    background: var(--ink);
+    color: #f0e8d0;
+    border: 2px solid var(--ink);
+    border-radius: 24px;
+    padding: 10px 16px 10px 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 150;
+    box-shadow: 3px 3px 0 var(--shadow);
+    letter-spacing: 0.02em;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .mobile-contact-fab:hover,
+  .mobile-contact-fab:active {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--shadow);
+  }
+  .mobile-contact-fab .fab-at { font-size: 16px; line-height: 1; }
+
+  /* Bottom nav */
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 56px;
+    background: var(--bg3);
+    border-top: 2px solid var(--border);
+    z-index: 120;
+  }
+
+  .mobile-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    border-right: 1px solid rgba(0,0,0,0.12);
+    cursor: pointer;
+    padding: 0 4px;
+    text-align: center;
+    line-height: 1.25;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.1s, color 0.1s;
+  }
+  .mobile-tab:last-child { border-right: none; }
+
+  .mobile-tab.active { color: var(--ink); }
+  .mobile-tab-ai.active       { background: var(--yellow); }
+  .mobile-tab-before.active   { background: var(--blue); }
+  .mobile-tab-thinking.active { background: var(--pink); }
+  .mobile-tab-book.active     { background: var(--green); }
+  .mobile-tab-about.active    { background: var(--bg2); }
+}
 </style>
 </head>
 <body>
@@ -629,6 +745,21 @@ body {
     <a class="drawer-link" href="https://mandiraauplish.substack.com" target="_blank" rel="noopener">substack ↗</a>
   </div>
 </div>
+
+<!-- MOBILE CONTACT FAB -->
+<button class="mobile-contact-fab" onclick="toggleContact()" aria-label="contact">
+  <span class="fab-at">@</span>
+  <span>say hi.</span>
+</button>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav" role="navigation" aria-label="main navigation">
+  <button class="mobile-tab mobile-tab-ai active" data-panel="ai" onclick="show('ai')">with AI</button>
+  <button class="mobile-tab mobile-tab-before" data-panel="before" onclick="show('before')">before AI</button>
+  <button class="mobile-tab mobile-tab-thinking" data-panel="thinking" onclick="show('thinking')">thinking</button>
+  <button class="mobile-tab mobile-tab-book" data-panel="book" onclick="show('book')">the wedgie</button>
+  <button class="mobile-tab mobile-tab-about" data-panel="about" onclick="show('about')">about</button>
+</nav>
 
 
 <!-- ======================== WITH AI ======================== -->
@@ -952,6 +1083,9 @@ function show(name) {
   tabs[map[name]].classList.add('active-' + names[map[name]]);
   tabs[map[name]].classList.add('active');
   names.forEach((n,i) => { if(i !== map[name]) tabs[i].classList.remove('active-'+n); });
+  document.querySelectorAll('.mobile-tab').forEach(t => t.classList.remove('active'));
+  const mobileTab = document.querySelector('.mobile-tab[data-panel="' + name + '"]');
+  if (mobileTab) mobileTab.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

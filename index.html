@@ -623,9 +623,9 @@ body {
 }
 
 @media (max-width: 480px) {
-  /* Hide top taskbar — bottom nav takes over */
+  /* Hide top taskbar — mobile nav takes over */
   .taskbar { display: none; }
-  .panel { min-height: 100vh; padding-bottom: 72px; }
+  .panel { min-height: calc(100vh - 56px); padding-bottom: 80px; }
 
   /* Gain content width on narrow phones */
   .window { margin: 8px; }
@@ -650,11 +650,11 @@ body {
   /* Drawer */
   .drawer { padding: 16px; }
 
-  /* Contact FAB — floats above bottom nav */
+  /* Contact FAB — bottom right */
   .mobile-contact-fab {
     display: flex;
     position: fixed;
-    bottom: 66px;
+    bottom: 20px;
     right: 16px;
     align-items: center;
     gap: 8px;
@@ -679,14 +679,14 @@ body {
   }
   .mobile-contact-fab .fab-at { font-size: 16px; line-height: 1; }
 
-  /* Bottom nav */
+  /* Top nav */
   .mobile-nav {
     display: flex;
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
+    position: sticky;
+    top: 0;
     height: 56px;
     background: var(--bg3);
-    border-top: 2px solid var(--border);
+    border-bottom: 2px solid var(--border);
     z-index: 120;
   }
 

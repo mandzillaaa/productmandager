@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mandira auplish — productmandager.com</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #e8e0cc;
+  --bg2: #f5f0e8;
+  --bg3: #d4c8a8;
+  --border: #8a7a5a;
+  --ink: #1a1208;
+  --muted: #6a5a3a;
+  --shadow: #b0a080;
+  --yellow: #f0e060;
+  --blue: #a8c4e8;
+  --pink: #f0a8c0;
+  --green: #c4e8a8;
+  --mono: 'IBM Plex Mono', monospace;
+  --pixel: 'VT323', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--mono);
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ---- TASKBAR ---- */
+.taskbar {
+  background: var(--bg3);
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  padding: 8px 12px 0;
+  gap: 3px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  height: 64px;
+}
+.taskbar::-webkit-scrollbar { display: none; }
+
+.tab {
+  height: 40px;
+  padding: 0 18px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  border: 1.5px solid var(--border);
+  border-bottom: none;
+  background: var(--bg3);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: inset 1px 1px 0 #ece0c0, inset -1px 0 0 #a09070;
+  transition: opacity 0.1s;
+  outline: none;
+}
+
+.tab:hover:not(.active) { opacity: 0.8; }
+
+.tab.active {
+  height: 48px;
+  color: var(--ink);
+  box-shadow: inset 1px 1px 0 #ece0c0;
+  z-index: 2;
+}
+
+.tab-ai.active       { background: var(--yellow); }
+.tab-before.active   { background: var(--blue); }
+.tab-thinking.active { background: var(--pink); }
+.tab-book.active     { background: var(--green); }
+.tab-about.active    { background: var(--bg2); }
+
+.taskbar-right {
+  margin-left: auto;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  box-shadow: inset 1px 1px 0 #ece0c0, inset -1px -1px 0 #a09070;
+  color: var(--muted);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  transition: all 0.1s;
+}
+.icon-btn:hover { background: var(--bg2); color: var(--ink); }
+
+/* ---- PANELS ---- */
+.panel { display: none; min-height: calc(100vh - 64px); }
+.panel.active { display: block; }
+
+.panel-ai       { background: var(--yellow); }
+.panel-before   { background: var(--blue); }
+.panel-thinking { background: var(--pink); }
+.panel-book     { background: var(--green); }
+.panel-about    { background: var(--bg2); }
+
+/* ---- WINDOW ---- */
+.window {
+  margin: 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 3px 3px 0 var(--shadow);
+  overflow: hidden;
+  background: var(--bg2);
+}
+
+.win-bar {
+  background: linear-gradient(90deg, var(--bg3) 0%, #b8a878 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  user-select: none;
+}
+
+.win-dots { display: flex; gap: 4px; }
+.win-dot {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+.win-dot.r { background: #e87070; }
+.win-dot.y { background: #e8d050; }
+.win-dot.g { background: #70c870; }
+
+.win-body { padding: 20px 22px; }
+
+/* panel-specific window body bg */
+.panel-ai .window     { background: #fffce8; }
+.panel-before .window { background: #e8f2fc; }
+.panel-thinking .window { background: #fef0f6; }
+.panel-book .window   { background: #f0fce8; }
+
+/* ---- HERO ---- */
+.hero {
+  font-family: var(--pixel);
+  font-size: clamp(36px, 5vw, 60px);
+  line-height: 1.1;
+  color: var(--ink);
+  margin-bottom: 14px;
+  letter-spacing: 0;
+}
+
+.hero .dim { color: var(--muted); }
+.panel-before .hero { color: #0a1a3a; }
+.panel-before .hero .dim { color: #4a6080; }
+.panel-thinking .hero { color: #3a0a1a; }
+.panel-book .hero { color: #0a2a0a; }
+
+.hero-sub {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+  max-width: 640px;
+}
+
+.panel-before .hero-sub { color: #2a4060; }
+.panel-thinking .hero-sub { color: #5a1a30; }
+
+/* ---- SECTION LABEL ---- */
+.sec-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 14px 6px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+/* ---- CARD GRID ---- */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 8px 14px 14px;
+}
+
+.card {
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 2px 2px 0 var(--shadow);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--ink);
+  display: block;
+  transition: transform 0.1s, box-shadow 0.1s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translate(-1px,-1px);
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.card-titlebar {
+  background: linear-gradient(90deg, var(--bg3), #bfaf88);
+  border-bottom: 1px solid var(--border);
+  padding: 4px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.card-badge {
+  background: var(--ink);
+  color: #f0e8d0;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+}
+
+.card-body {
+  padding: 10px 12px 8px;
+}
+
+.card-title {
+  font-family: var(--pixel);
+  font-size: 22px;
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 3px;
+}
+
+.card-sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 7px;
+  letter-spacing: 0.02em;
+}
+
+.card-desc {
+  font-size: 11px;
+  line-height: 1.65;
+  color: #3a2e1a;
+}
+
+.card-link {
+  display: block;
+  padding: 6px 12px 8px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.tags {
+  padding: 4px 12px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--muted);
+  border-radius: 2px;
+}
+
+/* ---- FRAMEWORKS ---- */
+.frameworks {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.framework {
+  background: #fef0f6;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 14px;
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.fw-num {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
+}
+
+.fw-title {
+  font-family: var(--pixel);
+  font-size: 20px;
+  color: var(--ink);
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.fw-body { font-size: 11px; line-height: 1.65; color: #4a3a2a; }
+
+/* ---- WRITING ROWS ---- */
+.writing-row {
+  background: rgba(255,255,255,0.5);
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  color: var(--ink);
+  box-shadow: 2px 2px 0 var(--shadow);
+  transition: transform 0.1s;
+}
+.writing-row:hover { transform: translate(-1px,-1px); }
+.writing-name { font-family: var(--pixel); font-size: 22px; margin-bottom: 3px; }
+.writing-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.writing-arrow { font-size: 18px; opacity: 0.5; flex-shrink: 0; margin-left: 12px; }
+
+/* ---- BOOK LAYOUT ---- */
+.book-hero-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.book-hero-text { flex: 1; }
+
+.book-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1.5px solid var(--border);
+}
+
+.book-bottom > div:first-child {
+  border-right: 1.5px solid var(--border);
+}
+
+.book-cover {
+  width: 140px; height: 196px;
+  background: #C45E1A;
+  border-radius: 3px;
+  border: 1.5px solid #8a3a08;
+  box-shadow: 3px 3px 0 #8a3a08;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 14px; text-align: center;
+  margin-bottom: 16px;
+}
+
+.book-cover-title {
+  font-family: var(--pixel);
+  font-size: 18px; color: white;
+  line-height: 1.2; margin-bottom: 8px;
+}
+
+.book-cover-sub {
+  font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+
+.book-title {
+  font-family: var(--pixel);
+  font-size: clamp(24px, 3.5vw, 40px);
+  color: #0a2a0a;
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+
+.book-context {
+  font-size: 11px; color: var(--muted);
+  line-height: 1.7; margin-bottom: 14px;
+}
+
+.book-tagline {
+  font-size: 12px; line-height: 1.75;
+  color: #2a4a2a; margin-bottom: 24px;
+}
+
+/* PILL FAQ */
+.pill-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 12px;
+}
+
+.book-pill {
+  background: rgba(255,255,255,0.5);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-family: var(--mono);
+  font-size: 12px; font-weight: 700;
+  color: #1a2a1a;
+  margin-bottom: 7px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--shadow);
+  transition: all 0.1s;
+}
+
+.book-pill:hover, .book-pill.open {
+  background: #2d6e2d; color: #f0fce8;
+  border-color: #3a8a3a;
+}
+
+.book-pill.open .pill-ans { display: block; color: #d4f0d4; }
+
+.pill-ans {
+  font-size: 11px; font-weight: 400;
+  margin-top: 5px; display: none;
+  line-height: 1.6;
+}
+
+/* WAITLIST */
+.waitlist-box {
+  background: #2d6e2d;
+  border-radius: 4px;
+  border: 1.5px solid #3a8a3a;
+  box-shadow: 3px 3px 0 #3a8a3a;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.wl-title {
+  font-family: var(--pixel);
+  font-size: 22px; color: #f0fce8;
+  margin-bottom: 4px;
+}
+
+.wl-sub { font-size: 11px; color: #c4e8c4; margin-bottom: 14px; }
+
+.wl-input {
+  width: 100%;
+  background: #1e5a1e;
+  border: 1px solid #3a8a3a;
+  border-radius: 20px;
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: #f0fce8;
+  outline: none;
+  margin-bottom: 7px;
+  display: block;
+}
+
+.wl-input::placeholder { color: #a0c8a0; }
+.wl-input:focus { border-color: #c4e8c4; }
+
+.wl-btn {
+  width: 100%;
+  background: var(--yellow);
+  border: 1.5px solid #a09000;
+  border-radius: 20px;
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 12px; font-weight: 700;
+  color: #3a2e00;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #a09000;
+  transition: all 0.1s;
+}
+
+.wl-btn:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 #a09000; }
+
+/* ---- ABOUT ---- */
+.about-body {
+  font-family: var(--pixel);
+  font-size: clamp(24px, 3.5vw, 40px);
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 32px;
+}
+
+.about-body .dim { color: var(--muted); font-family: var(--mono); font-size: 60%; font-weight: 400; }
+
+.tools-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 24px;
+}
+
+.col-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 10px;
+}
+
+.tool-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.tool {
+  font-size: 11px; font-weight: 700;
+  padding: 5px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg2);
+  color: var(--ink);
+  box-shadow: 1px 1px 0 var(--shadow);
+  letter-spacing: 0.01em;
+}
+
+.exp-list { border-top: 1.5px solid var(--border); }
+
+.exp-row {
+  display: grid; grid-template-columns: 100px 1fr auto;
+  gap: 12px; padding: 12px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  align-items: start;
+}
+
+.exp-year { font-size: 11px; color: var(--muted); padding-top: 3px; }
+.exp-co { font-family: var(--pixel); font-size: 20px; color: var(--ink); margin-bottom: 2px; }
+.exp-role { font-size: 11px; color: var(--muted); }
+
+.exp-badge {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 2px;
+  background: var(--bg3); color: var(--muted);
+  border: 1px solid var(--border);
+  white-space: nowrap; margin-top: 3px;
+}
+
+.exp-badge.hi { background: var(--ink); color: #f0e8d0; border-color: var(--ink); }
+
+/* ---- CONTACT OVERLAY ---- */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 200;
+  align-items: flex-start; justify-content: flex-end;
+  padding: 76px 16px 0;
+}
+.overlay.open { display: flex; }
+
+.drawer {
+  background: var(--bg2);
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  padding: 20px 22px;
+  width: 300px;
+  box-shadow: 4px 4px 0 var(--shadow);
+}
+
+.drawer-title { font-family: var(--pixel); font-size: 28px; color: var(--ink); margin-bottom: 4px; }
+.drawer-sub { font-size: 11px; color: var(--muted); margin-bottom: 18px; line-height: 1.6; }
+
+.drawer-link {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.1);
+  font-size: 13px; font-weight: 700;
+  text-decoration: none; color: var(--ink);
+  transition: color 0.1s;
+}
+
+.drawer-link:last-child { border-bottom: none; }
+.drawer-link:hover { color: var(--muted); }
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 680px) {
+  .taskbar { padding: 6px 8px 0; height: 56px; }
+  .tab { font-size: 11px; padding: 0 12px; height: 34px; }
+  .tab.active { height: 42px; }
+  .win-body { padding: 16px; }
+  .card-grid { grid-template-columns: 1fr; }
+  .frameworks { grid-template-columns: 1fr; }
+  .tools-grid { grid-template-columns: 1fr; }
+  .book-hero-row { flex-direction: column; }
+  .book-bottom { grid-template-columns: 1fr; }
+  .book-bottom > div:first-child { border-right: none; border-bottom: 1.5px solid var(--border); }
+  .exp-row { grid-template-columns: 80px 1fr; }
+  .exp-badge { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- TASKBAR -->
+<div class="taskbar">
+  <button class="tab tab-ai active"       onclick="show('ai')">with AI</button>
+  <button class="tab tab-before"          onclick="show('before')">before AI</button>
+  <button class="tab tab-thinking"        onclick="show('thinking')">thinking</button>
+  <button class="tab tab-book"            onclick="show('book')">just take out the wedgie</button>
+  <button class="tab tab-about"           onclick="show('about')">about</button>
+  <div class="taskbar-right">
+    <button class="icon-btn" onclick="toggleContact()" aria-label="contact">@</button>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+  <div class="drawer">
+    <div class="drawer-title">say hi.</div>
+    <div class="drawer-sub">got a product that needs a mandager?</div>
+    <a class="drawer-link" href="mailto:mandyauplish@gmail.com?subject=hi%20mandira&body=i%20have%20a%20product%20that%20needs%20a%20mandager.">mandyauplish@gmail.com ↗</a>
+    <a class="drawer-link" href="https://linkedin.com/in/mandyauplish" target="_blank" rel="noopener">linkedin ↗</a>
+    <a class="drawer-link" href="https://mandiraauplish.substack.com" target="_blank" rel="noopener">substack ↗</a>
+  </div>
+</div>
+
+
+<!-- ======================== WITH AI ======================== -->
+<div class="panel panel-ai active" id="panel-ai">
+  <div class="window">
+    <div class="win-bar">
+      <span>with_AI — mandira_auplish.exe</span>
+      <div class="win-dots"><div class="win-dot r"></div><div class="win-dot y"></div><div class="win-dot g"></div></div>
+    </div>
+    <div class="win-body">
+      <div class="hero">building is easy now.<br>making people care<br>is where you <span class="dim">win.</span></div>
+      <div class="hero-sub">i just needed AI to free up the time.</div>
+    </div>
+  </div>
+
+  <div class="sec-label">prototypes i've built with AI (2025 to now)</div>
+
+  <div class="card-grid">
+
+    <a class="card" href="https://navigate.juicebokx.com" target="_blank" rel="noopener">
+      <div class="card-titlebar"><span>navigate.exe</span><span class="card-badge">2025</span></div>
+      <div class="card-body">
+        <div class="card-title">navigate</div>
+        <div class="card-sub">juicebokx × new consensus</div>
+        <div class="card-desc">built in collaboration with New Consensus, Zack Exley's policy think tank. he wrote the policy that maps the systemic problem. we built the directory that helps people survive it.</div>
+      </div>
+      <div class="card-link">navigate.juicebokx.com ↗</div>
+      <div class="tags"><span class="tag">0 to 1</span><span class="tag">AI product</span><span class="tag">go-to-market</span></div>
+    </a>
+
+    <a class="card" href="https://juicebokx.world" target="_blank" rel="noopener">
+      <div class="card-titlebar"><span>juicebokx_world.exe</span><span class="card-badge">2025</span></div>
+      <div class="card-body">
+        <div class="card-title">juicebokx world</div>
+        <div class="card-sub">co-founder · venture studio</div>
+        <div class="card-desc">a studio for founders with good ideas nobody gets yet. featured client: New Consensus. Zack Exley, who wrote the Green New Deal, needed someone to help tell the story, build the site, and make it land.</div>
+      </div>
+      <div class="card-link">juicebokx.world ↗</div>
+      <div class="tags"><span class="tag">branding</span><span class="tag">AI</span><span class="tag">storytelling</span><span class="tag">0 to 1</span></div>
+    </a>
+
+    <a class="card" href="https://frank.dating/mandira" target="_blank" rel="noopener">
+      <div class="card-titlebar"><span>frank_dating.exe</span><span class="card-badge">2025</span></div>
+      <div class="card-body">
+        <div class="card-title">frank dating</div>
+        <div class="card-sub">co-founder · dating app</div>
+        <div class="card-desc">1,000 sign ups in 7 days. the hook: apply to date me. the actual problem: most apps ask what you want. frank matches on who you actually are.</div>
+      </div>
+      <div class="card-link">frank.dating/mandira ↗</div>
+      <div class="tags"><span class="tag">consumer apps</span><span class="tag">AI matching</span><span class="tag">B2C</span><span class="tag">growth</span></div>
+    </a>
+
+    <a class="card" href="https://juicebokx.com" target="_blank" rel="noopener">
+      <div class="card-titlebar"><span>juicebokx.exe</span><span class="card-badge">2025</span></div>
+      <div class="card-body">
+        <div class="card-title">juicebokx</div>
+        <div class="card-sub">co-founder · analog products</div>
+        <div class="card-desc">two burned-out tech people made a word search puzzle book. not a platform, not an app, not a cult. (okay maybe a little cult.)</div>
+      </div>
+      <div class="card-link">juicebokx.com ↗</div>
+      <div class="tags"><span class="tag">physical products</span><span class="tag">DTC</span><span class="tag">branding</span></div>
+    </a>
+
+    <div class="card">
+      <div class="card-titlebar"><span>productmandager.exe</span><span class="card-badge">2025</span></div>
+      <div class="card-body">
+        <div class="card-title">this portfolio</div>
+        <div class="card-sub">productmandager.com</div>
+        <div class="card-desc">this site is a prototype too. built with Claude in an afternoon.</div>
+      </div>
+      <div class="tags"><span class="tag">AI product</span><span class="tag">meta</span></div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ======================== BEFORE AI ======================== -->
+<div class="panel panel-before" id="panel-before">
+  <div class="window">
+    <div class="win-bar">
+      <span>before_AI — archive.exe</span>
+      <div class="win-dots"><div class="win-dot r"></div><div class="win-dot y"></div><div class="win-dot g"></div></div>
+    </div>
+    <div class="win-body">
+      <div class="hero">before AI, i was<br>still shipping.</div>
+      <div class="hero-sub">here's what taught me what actually matters.</div>
+    </div>
+  </div>
+
+  <div class="sec-label">selected work (2017 to 2024)</div>
+
+  <div class="card-grid">
+
+    <div class="card">
+      <div class="card-titlebar"><span>everand.exe</span><span class="card-badge">2022–24</span></div>
+      <div class="card-body">
+        <div class="card-title">everand</div>
+        <div class="card-sub">scribd · senior PM</div>
+        <div class="card-desc">built the entire everand app from scratch. led a 50+ person cross-functional team across iOS and android. new audio player built from the ground up. apple's app of the day.</div>
+      </div>
+      <div class="tags"><span class="tag">0 to 1</span><span class="tag">mobile</span><span class="tag">subscription</span><span class="tag">B2C</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-titlebar"><span>aritzia.exe</span><span class="card-badge">2020–21</span></div>
+      <div class="card-body">
+        <div class="card-title">aritzia</div>
+        <div class="card-sub">digital product manager</div>
+        <div class="card-desc">rebuilt aritzia.com end-to-end. $20M incremental revenue. launched Afterpay in 3 months (+32% AOV). COVID pivot: $500k in 3 weeks. dressed impeccably the entire time.</div>
+      </div>
+      <div class="tags"><span class="tag">e-commerce</span><span class="tag">conversion</span><span class="tag">personalization</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-titlebar"><span>frankly.exe</span><span class="card-badge">2020–22</span></div>
+      <div class="card-body">
+        <div class="card-title">frankly</div>
+        <div class="card-sub">founder · digital funeral marketplace</div>
+        <div class="card-desc">started a digital funeral company. launched a marketplace, secured 20+ partnerships, and got yelled at by funeral home owners a lot.</div>
+      </div>
+      <div class="tags"><span class="tag">0 to 1</span><span class="tag">marketplace</span><span class="tag">founder</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-titlebar"><span>ethos.exe</span><span class="card-badge">2021–22</span></div>
+      <div class="card-body">
+        <div class="card-title">ethos</div>
+        <div class="card-sub">product manager</div>
+        <div class="card-desc">101% revenue growth. +55% referral rate. launched 0 to 1 referral programs and shipped onboarding features driving +30% engagement in 2 weeks.</div>
+      </div>
+      <div class="tags"><span class="tag">growth</span><span class="tag">go-to-market</span><span class="tag">B2B</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-titlebar"><span>deloitte.exe</span><span class="card-badge">2017–19</span></div>
+      <div class="card-body">
+        <div class="card-title">deloitte</div>
+        <div class="card-sub">management consultant</div>
+        <div class="card-desc">expanded lululemon into 5 countries in 6 weeks — korea, japan, france, germany, and the uk (+67% international revenue). launched Canada's first recreational cannabis e-commerce platform. sold out in 90 seconds.</div>
+      </div>
+      <div class="tags"><span class="tag">consulting</span><span class="tag">international expansion</span><span class="tag">go-to-market</span></div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ======================== THINKING ======================== -->
+<div class="panel panel-thinking" id="panel-thinking">
+  <div class="window">
+    <div class="win-bar">
+      <span>thinking.exe</span>
+      <div class="win-dots"><div class="win-dot r"></div><div class="win-dot y"></div><div class="win-dot g"></div></div>
+    </div>
+    <div class="win-body">
+      <div class="hero">how i think.</div>
+      <div style="font-size:13px;line-height:1.8;color:#4a2a38;max-width:680px;margin-top:12px;">over 9 years of building products and trying to understand why people care about some and not others. i write about all of this at <a href="https://mandiraauplish.substack.com" target="_blank" rel="noopener" style="color:#3a0a1a;font-weight:700;text-decoration:underline;">soft static</a>. essays on AI, creativity, and what's mine and what isn't anymore. and fun and factual, a weekly dispatch on brand voice, authenticity, and building in public from someone who is still figuring it out. also reclaiming the em dash, one essay at a time.</div>
+    </div>
+  </div>
+
+  <div class="sec-label">worldview</div>
+  <div style="padding:8px 14px 14px;">
+    <div class="frameworks">
+      <div class="framework">
+        <div class="fw-num">01</div>
+        <div class="fw-title">build for the headline</div>
+        <div class="fw-body">the best products are already the marketing. if you can't explain why someone would care in one sentence, the product isn't done yet.</div>
+      </div>
+      <div class="framework">
+        <div class="fw-num">02</div>
+        <div class="fw-title">loops over launches</div>
+        <div class="fw-body">shipping is the easy part. the work is building the feedback loop that tells you why it worked or didn't, fast enough to do something about it.</div>
+      </div>
+      <div class="framework">
+        <div class="fw-num">03</div>
+        <div class="fw-title">distribution is a product decision</div>
+        <div class="fw-body">how people find it, share it, and come back is not a marketing problem. it gets designed in, not bolted on.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">writing</div>
+  <div style="padding:8px 14px 14px;">
+    <a class="writing-row" href="https://mandiraauplish.substack.com" target="_blank" rel="noopener">
+      <div><div class="writing-name">soft static</div><div class="writing-desc">essays on AI, creativity, and what's mine and what isn't anymore.</div></div>
+      <span class="writing-arrow">↗</span>
+    </a>
+    <a class="writing-row" href="https://mandiraauplish.substack.com" target="_blank" rel="noopener">
+      <div><div class="writing-name">fun and factual</div><div class="writing-desc">the weekly companion. some science, some swift, some signal, some hope.</div></div>
+      <span class="writing-arrow">↗</span>
+    </a>
+  </div>
+</div>
+
+
+<!-- ======================== BOOK ======================== -->
+<div class="panel panel-book" id="panel-book">
+
+  <!-- HERO -->
+  <div class="window">
+    <div class="win-bar">
+      <span>book.exe — turns out when AI handles the building, you have time to write a memoir.</span>
+      <div class="win-dots"><div class="win-dot r"></div><div class="win-dot y"></div><div class="win-dot g"></div></div>
+    </div>
+    <div class="win-body">
+      <div class="book-hero-row">
+        <div class="book-cover">
+          <div class="book-cover-title">just take out the wedgie</div>
+          <div class="book-cover-sub">a dating memoir</div>
+        </div>
+        <div class="book-hero-text">
+          <div class="book-title">just take out<br>the wedgie</div>
+          <p class="book-tagline">i moved to new york, met a lot of men, made a lot of friends, cried on a lot of subways, and slowly, embarrassingly, accidentally, became someone i actually like.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ + WAITLIST -->
+  <div class="book-bottom">
+    <div>
+      <div class="sec-label">frequently asked questions</div>
+      <div style="padding: 0 14px 14px;">
+        <div class="book-pill" onclick="togglePill(this)">is this a dating memoir?<div class="pill-ans">imagine if starting over, bad judgment, and a full emotional breakdown had a baby. then the baby had opinions.</div></div>
+        <div class="book-pill" onclick="togglePill(this)">is this self-help?<div class="pill-ans">god no. maybe. don't call it that.</div></div>
+        <div class="book-pill" onclick="togglePill(this)">who is this for?<div class="pill-ans">people who have cried in an uber and tipped well anyway.</div></div>
+        <div class="book-pill" onclick="togglePill(this)">are the men real?<div class="pill-ans">real enough. also not as memorable as they think.</div></div>
+        <div class="book-pill" onclick="togglePill(this)">is new york a character?<div class="pill-ans">new york has terrible apartment lighting and charges $22 for a cocktail. make of that what you will.</div></div>
+        <div class="book-pill" onclick="togglePill(this)">any regrets?<div class="pill-ans">no, which probably says everything.</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="sec-label">waitlist</div>
+      <div style="padding: 0 14px 14px;">
+        <div class="waitlist-box">
+          <div class="wl-title">join the waitlist.</div>
+          <div class="wl-sub">be the first to know when it's out.</div>
+          <input class="wl-input" type="text" id="wl-name" placeholder="full name">
+          <input class="wl-input" type="email" id="wl-email" placeholder="email" style="margin-bottom:10px;">
+          <button class="wl-btn" id="wl-submit" onclick="submitWaitlist()">add me to the waitlist.</button>
+          <div id="wl-msg" style="font-size:11px;margin-top:8px;display:none;"></div>        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ======================== ABOUT ======================== -->
+<div class="panel panel-about" id="panel-about">
+  <div class="window">
+    <div class="win-bar">
+      <span>about.exe — mandira_auplish</span>
+      <div class="win-dots"><div class="win-dot r"></div><div class="win-dot y"></div><div class="win-dot g"></div></div>
+    </div>
+    <div class="win-body">
+      <div class="about-body">i brand things first.<br>then i build them.<br>then i market them.<br>then i study why.<br><span class="dim">it's a bit of a loop.</span></div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8;max-width:600px;margin-bottom:32px;">currently building juicebokx world, juicebokx, and frank dating with co-founder Leen Taher. also writing a dating memoir called just take out the wedgie.</div>
+
+      <div class="tools-grid">
+        <div>
+          <div class="col-label">how i build</div>
+          <div class="tool-list"><span class="tool">Claude</span><span class="tool">Vercel</span><span class="tool">Netlify</span><span class="tool">GitHub</span><span class="tool">Supabase</span><span class="tool">VS Code</span><span class="tool">Figma</span><span class="tool">Notion</span></div>
+        </div>
+        <div>
+          <div class="col-label">how i market</div>
+          <div class="tool-list"><span class="tool">Claude</span><span class="tool">Claude Design</span><span class="tool">Runway</span><span class="tool">Banana Pro</span><span class="tool">Pomelli</span><span class="tool">Klaviyo</span><span class="tool">Canva</span><span class="tool">Google Analytics</span><span class="tool">growth loops</span><span class="tool">prompt engineering</span></div>
+        </div>
+      </div>
+
+      <div class="col-label" style="margin-bottom:10px;">everything i work in</div>
+      <div class="tool-list" style="margin-bottom:32px;"><span class="tool">0 to 1</span><span class="tool">consumer apps</span><span class="tool">mobile</span><span class="tool">growth</span><span class="tool">AI product</span><span class="tool">product-led growth</span><span class="tool">B2C</span><span class="tool">marketplace</span><span class="tool">subscription</span><span class="tool">go-to-market</span><span class="tool">branding</span><span class="tool">storytelling</span><span class="tool">e-commerce</span><span class="tool">conversion</span><span class="tool">personalization</span><span class="tool">community</span><span class="tool">DTC</span><span class="tool">physical products</span><span class="tool">AI matching</span><span class="tool">consulting</span><span class="tool">international expansion</span><span class="tool">analog</span><span class="tool">publishing</span><span class="tool">venture studio</span><span class="tool">agency</span></div>
+
+      <div class="col-label" style="margin-bottom:0;">experience</div>
+      <div class="exp-list">
+        <div class="exp-row">
+          <div class="exp-year">2025 → now</div>
+          <div><div class="exp-co">juicebokx world</div><div class="exp-role">co-founder · a branding agency, an analog consumer brand, and a dating app walk into a bar. we call it a venture studio.</div></div>
+          
+        </div>
+        <div class="exp-row">
+          <div class="exp-year">2022–2024</div>
+          <div><div class="exp-co">scribd / everand</div><div class="exp-role">senior product manager</div></div>
+          
+        </div>
+        <div class="exp-row">
+          <div class="exp-year">2021–2022</div>
+          <div><div class="exp-co">ethos</div><div class="exp-role">product manager</div></div>
+          
+        </div>
+        <div class="exp-row">
+          <div class="exp-year">2020–2022</div>
+          <div><div class="exp-co">frankly</div><div class="exp-role">founder</div></div>
+          
+        </div>
+        <div class="exp-row">
+          <div class="exp-year">2020–2021</div>
+          <div><div class="exp-co">aritzia</div><div class="exp-role">digital product manager</div></div>
+          
+        </div>
+        <div class="exp-row">
+          <div class="exp-year">2017–2019</div>
+          <div><div class="exp-co">deloitte</div><div class="exp-role">management consultant</div></div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+function show(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  const map = { ai:0, before:1, thinking:2, book:3, about:4 };
+  const tabs = document.querySelectorAll('.tab');
+  const names = ['ai','before','thinking','book','about'];
+  tabs[map[name]].classList.add('active-' + names[map[name]]);
+  tabs[map[name]].classList.add('active');
+  names.forEach((n,i) => { if(i !== map[name]) tabs[i].classList.remove('active-'+n); });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleContact() {
+  document.getElementById('overlay').classList.toggle('open');
+}
+
+function closeOverlay(e) {
+  if (e.target === document.getElementById('overlay')) {
+    document.getElementById('overlay').classList.remove('open');
+  }
+}
+
+function togglePill(el) {
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.book-pill').forEach(p => p.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+}
+
+async function submitWaitlist() {
+  const name = document.getElementById('wl-name').value.trim();
+  const email = document.getElementById('wl-email').value.trim();
+  const msg = document.getElementById('wl-msg');
+  const btn = document.getElementById('wl-submit');
+
+  if (!email) { showMsg('please enter your email.', '#f0a8a8'); return; }
+
+  btn.textContent = 'adding you...';
+  btn.disabled = true;
+
+  const nameParts = name.split(' ');
+  const firstName = nameParts[0] || '';
+  const lastName = nameParts.slice(1).join(' ') || '';
+
+  try {
+    const res = await fetch('https://a.klaviyo.com/client/subscriptions/?company_id=RfK8su', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'revision': '2023-12-15' },
+      body: JSON.stringify({
+        data: {
+          type: 'subscription',
+          attributes: {
+            profile: {
+              data: {
+                type: 'profile',
+                attributes: {
+                  email,
+                  first_name: firstName,
+                  last_name: lastName
+                }
+              }
+            }
+          },
+          relationships: {
+            list: { data: { type: 'list', id: 'SVhvrB' } }
+          }
+        }
+      })
+    });
+
+    if (res.ok || res.status === 202) {
+      btn.textContent = "you're on the list.";
+      document.getElementById('wl-name').value = '';
+      document.getElementById('wl-email').value = '';
+      showMsg("you're in. we'll let you know when it's out.", '#c4e8c4');
+    } else {
+      btn.textContent = 'add me to the waitlist.';
+      btn.disabled = false;
+      showMsg('something went wrong. try again?', '#f0a8a8');
+    }
+  } catch(e) {
+    btn.textContent = 'add me to the waitlist.';
+    btn.disabled = false;
+    showMsg('something went wrong. try again?', '#f0a8a8');
+  }
+}
+
+function showMsg(text, color) {
+  const msg = document.getElementById('wl-msg');
+  msg.textContent = text;
+  msg.style.color = color;
+  msg.style.display = 'block';
+}
+</script>
+</body>
+</html>

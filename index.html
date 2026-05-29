@@ -597,10 +597,15 @@ body {
 .drawer-link:hover { color: var(--muted); }
 
 /* ---- RESPONSIVE ---- */
+.tab-short { display: none; }
+
 @media (max-width: 680px) {
   .taskbar { padding: 6px 8px 0; height: 56px; }
-  .tab { font-size: 11px; padding: 0 12px; height: 34px; }
+  .tab { font-size: 11px; padding: 0 12px; height: 34px; border: none; box-shadow: none; }
   .tab.active { height: 42px; }
+  .tab-full { display: none; }
+  .tab-short { display: inline; }
+  .taskbar-right { display: none; }
   .win-body { padding: 16px; }
   .card-grid { grid-template-columns: 1fr; }
   .frameworks { grid-template-columns: 1fr; }
@@ -701,7 +706,6 @@ body {
     color: var(--muted);
     background: transparent;
     border: none;
-    border-right: 1px solid rgba(0,0,0,0.12);
     cursor: pointer;
     padding: 0 4px;
     text-align: center;
@@ -710,7 +714,7 @@ body {
     -webkit-tap-highlight-color: transparent;
     transition: background 0.1s, color 0.1s;
   }
-  .mobile-tab:last-child { border-right: none; }
+
 
   .mobile-tab.active { color: var(--ink); }
   .mobile-tab-ai.active       { background: var(--yellow); }
@@ -728,7 +732,7 @@ body {
   <button class="tab tab-ai active"       onclick="show('ai')">with AI</button>
   <button class="tab tab-before"          onclick="show('before')">before AI</button>
   <button class="tab tab-thinking"        onclick="show('thinking')">thinking</button>
-  <button class="tab tab-book"            onclick="show('book')">just take out the wedgie</button>
+  <button class="tab tab-book"            onclick="show('book')"><span class="tab-full">just take out the wedgie</span><span class="tab-short">the wedgie</span></button>
   <button class="tab tab-about"           onclick="show('about')">about</button>
   <div class="taskbar-right">
     <button class="icon-btn" onclick="toggleContact()" aria-label="contact">@</button>

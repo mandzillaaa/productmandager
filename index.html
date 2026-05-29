@@ -40,8 +40,8 @@ body {
   background: var(--bg3);
   border-bottom: 2px solid var(--border);
   display: flex;
-  align-items: stretch;
-  padding: 0 12px;
+  align-items: flex-end;
+  padding: 8px 12px 0;
   gap: 3px;
   position: sticky;
   top: 0;
@@ -54,6 +54,7 @@ body {
 .taskbar::-webkit-scrollbar { display: none; }
 
 .tab {
+  height: 40px;
   padding: 0 18px;
   font-family: var(--mono);
   font-size: 13px;
@@ -76,6 +77,7 @@ body {
 .tab:hover:not(.active) { opacity: 0.8; }
 
 .tab.active {
+  height: 48px;
   color: var(--ink);
   box-shadow: inset 1px 1px 0 #ece0c0;
   z-index: 2;
@@ -596,8 +598,9 @@ body {
 
 /* ---- RESPONSIVE ---- */
 @media (max-width: 680px) {
-  .taskbar { padding: 0 8px; height: 56px; }
-  .tab { font-size: 11px; padding: 0 12px; }
+  .taskbar { padding: 6px 8px 0; height: 56px; }
+  .tab { font-size: 11px; padding: 0 12px; height: 34px; }
+  .tab.active { height: 42px; }
   .win-body { padding: 16px; }
   .card-grid { grid-template-columns: 1fr; }
   .frameworks { grid-template-columns: 1fr; }
